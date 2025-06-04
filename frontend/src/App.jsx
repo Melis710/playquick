@@ -7,7 +7,6 @@ import About from "./pages/About";
 import RandomPlay from "./pages/RandomPlay";
 import SearchResults from "./pages/SearchResults";
 import CarGame from './games/CarGame'
-import PuzzleGame from "./games/PuzzleGame";
 import SlidingPuzzlePage from "./pages/SlidingPuzzlePage"; // Adjust the import path as necessary
 
 function App() {
@@ -21,8 +20,7 @@ function App() {
           <Route path="/random" element={<RandomPlay />} />
           <Route path="/search" element={<SearchResults />} />
           <Route path="/car_game" element={<CarGame />} />
-          <Route path="/puzzle_game" element={<PuzzleGame />} />
-          <Route path="/sliding-puzzle-game" element={<SlidingPuzzlePage />} />
+          <Route path="/sliding_puzzle_game" element={<SlidingPuzzlePage />} />
           
         </Routes>
       </div>

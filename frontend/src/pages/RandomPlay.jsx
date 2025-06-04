@@ -6,7 +6,7 @@ const RandomPlay = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const gamePages = ['/car_game','/puzzle_game']
+        const gamePages = ['/car_game','/sliding_puzzle_game']
         const random = gamePages[Math.floor(Math.random()*gamePages.length)];
         navigate(random);
     }, [navigate]);

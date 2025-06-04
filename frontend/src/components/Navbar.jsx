@@ -17,7 +17,7 @@ const Navbar = () => {
             </form>
           </li>
           <li><Link to="/random">Random Play</Link></li>
-          <li><Link to="/sliding-puzzle-game">SlidingPuzzle</Link></li>
+          <li><Link to="/sliding_puzzle_game">SlidingPuzzle</Link></li>
           
         </ul>
       </div>
