@@ -2,9 +2,10 @@
 import React from "react";
 import Header from "../components/Header";
 
+
 const HomePage = () => {
   return (
-    <div>
+    <div className='HomePage'>
       <Header />
     </div>
   );

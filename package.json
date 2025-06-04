@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "phaser": "^3.90.0",
+    "react-motion": "^0.5.2"
+  }
+}

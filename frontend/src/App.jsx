@@ -6,9 +6,9 @@ import HomePage from "./pages/HomePage";
 import About from "./pages/About";
 import RandomPlay from "./pages/RandomPlay";
 import SearchResults from "./pages/SearchResults";
+import SlidingPuzzlePage from "./pages/SlidingPuzzlePage"; // Adjust the import path as necessary
 
 function App() {
-
   return (
     <Router>
       <Navbar />
@@ -18,6 +18,8 @@ function App() {
           <Route path="/about" element={<About />} />
           <Route path="/random" element={<RandomPlay />} />
           <Route path="/search" element={<SearchResults />} />
+          <Route path="/sliding-puzzle-game" element={<SlidingPuzzlePage />} />
+          
         </Routes>
       </div>
     </Router>
