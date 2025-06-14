@@ -13,7 +13,7 @@ function App() {
   return (
     <Router>
       <Navbar />
-      <div style={{ paddingTop: "80px" }}>
+      <div style={{ paddingTop: "20px" }}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<About />} />

@@ -1,0 +1,4 @@
+backend/.env
+backend/logs/server.log
+backend/tmp/build-errors.log
+backend/tmp/main

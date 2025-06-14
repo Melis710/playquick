@@ -1,12 +1,17 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import SaveScorePrompt from "../components/SaveScorePrompt";
 
 const CarGame = () => {
-  const [high_score, setHighScore] = useState(0);
+  const [showSavePrompt, setShowSavePrompt] = useState(false);
+  const [score, setScore] = useState(null);
 
   useEffect(() => {
     const handleMessage = (event) => {
-      if (event.data?.type === 'highScoreUpdate') {
-        setHighScore(event.data.score);
+      if (event.origin !== window.location.origin) return;
+
+      if (event.data?.type === "highScoreUpdate") {
+        setScore(event.data.score);
+        setShowSavePrompt(true);
       }
     };
 
@@ -15,8 +20,7 @@ const CarGame = () => {
   }, []);
 
   return (
-    <div style={{ width: '100%', height: '720px' }}>
-      <h1>High Score: {high_score}</h1>
+    <div style={{ width: "100%", height: "720px", position: "relative" }}>
       <iframe
         title="Godot Game"
         src="/godot/car_game.html"
@@ -25,6 +29,13 @@ const CarGame = () => {
         frameBorder="0"
         allowFullScreen
       ></iframe>
+
+      <SaveScorePrompt
+        visible={showSavePrompt}
+        onClose={() => setShowSavePrompt(false)}
+        score={score}
+        gameName="car_game"
+      />
     </div>
   );
 };
