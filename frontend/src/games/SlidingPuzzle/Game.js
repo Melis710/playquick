@@ -621,7 +621,7 @@ class Game extends Phaser.Scene {
     } else if (this.photo === 'level2') {
       nextPhoto = 'level3';
       backgnd = 'level3-back';
-      iterations = 5;
+      iterations = 20;
       size = 3;
       this.leveltimer = 90;
       this.BaseScore = 1500;
