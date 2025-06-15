@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import ShinePostFX from './ShinePostFX';
 import WipePostFX from './WipePostFX';
+import SlidingPuzzlePage from '../../pages/SlidingPuzzlePage';
 
 /* constants for game logic */
 const SlidingPuzzle = {
@@ -34,6 +35,19 @@ class Preloader extends Phaser.Scene {
     this.load.image('level1', 'src/games/SlidingPuzzle/assets/level1.jpg');  // puzzle image for level 1
     this.load.image('level2-back', 'src/games/SlidingPuzzle/assets/level2-back.jpg');  // backgLevel for level 2
     this.load.image('level2', 'src/games/SlidingPuzzle/assets/level2.jpg');  // puzzle image for level 2
+    this.load.image('level3-back', 'src/games/SlidingPuzzle/assets/level3-back.jpg');  // backgLevel for level 3
+    this.load.image('level3', 'src/games/SlidingPuzzle/assets/level3.jpg');  // puzzle image for level 3
+
+    
+
+    // load audio
+    this.load.setPath('https://labs.phaser.io/assets/games/emoji-match/sounds/');
+    this.load.audio('fail', [ 'countdown.ogg', 'countdown.m4a', 'countdown.mp3' ]);
+    this.load.setPath('https://labs.phaser.io/assets/games/sliding-puzzle/audio');
+    this.load.audio('move', [ 'move.m4a', 'move.wav', 'move.ogg' ]);
+    this.load.audio('win', [ 'win.m4a', 'win.wav', 'win.ogg' ]);
+    
+    
   }
   create() {
     
@@ -45,12 +59,14 @@ class Preloader extends Phaser.Scene {
 class GameStart extends Phaser.Scene {
   constructor() {
     super('GameStart');
+    
   }
   create() {
+    
     const color = this.registry.get('bgColor') || '#e6cab3';
 this.cameras.main.setBackgroundColor(color);
     const frame_inside = this.add.image(500, 375, 'frame-inside');
-    const play_button = this.add.image(500, 500, 'play-button');
+    const play_button = this.add.image(500, 540, 'play-button');
 
     
 
@@ -80,7 +96,7 @@ this.cameras.main.setBackgroundColor(color);
     // Set the play button shine effect and click event responses
     this.tweens.add({
       targets: play_button,
-      y: 500,
+      y: 540,
       delay: 1500,
       duration: 150,  // response to the click
       ease: 'sine.out',
@@ -99,7 +115,9 @@ this.cameras.main.setBackgroundColor(color);
             progress: 1,
             duration: 2000,  // wipe effect duration
             onComplete: () => {
+              
               this.scene.start('Game');
+              
               
             }
           });
@@ -124,7 +142,7 @@ class Game extends Phaser.Scene {
     //  The speed at which the tiles slide, and the tween they use
     this.slideSpeed = 300;
     this.slideEase = 'power3';
-    this.iterations = 15;  // number of iterations for the puzzle walker scrambling up the puzzle
+    this.iterations = 5;  // number of iterations for the puzzle walker scrambling up the puzzle
     this.shuffleSpeed = 100;  // speed of the shuffle, 0 for instantly scrambled
     this.shuffleEase = 'power1';
     this.lastMove = null;
@@ -177,8 +195,8 @@ this.cameras.main.setBackgroundColor(color);
       duration: 2000,
       onComplete: () => {
         this.reveal.destroy();  // destroy the reveal
-        this.leveltimer = 120;  // set timer to 2 mins for level1
-        this.BaseScore = 500;  // base score is 500 for level1
+        this.leveltimer = 10;  // set timer to 10 for level1
+        this.BaseScore = 100;  // base score is 500 for level1
         this.scoreLabel = this.add.text(timer_x, timer_y+300, 'Score:', {
       fontSize: '28px',
       fontFamily: 'Arial',
@@ -204,6 +222,7 @@ this.cameras.main.setBackgroundColor(color);
    *    columns: number of columns in puzzle
    */
   startPuzzle(key, rows, columns) {
+    
     this.photo = key;
 
     //  The size of the puzzle, in pieces (not pixels)
@@ -317,6 +336,8 @@ this.cameras.main.setBackgroundColor(color);
         this.swapPiece(spacerRow + 1, spacerCol);
         break;
     }
+
+    this.sound.play('move');  // play move sound
 
   }
 
@@ -507,7 +528,7 @@ this.cameras.main.setBackgroundColor(color);
   slidePiece(piece, x, y) {
     this.action = SlidingPuzzle.TWEENING;
 
-    //this.sound.play('move');
+    this.sound.play('move');
 
     this.tweens.add({
       targets: piece,
@@ -545,10 +566,10 @@ this.cameras.main.setBackgroundColor(color);
       //  Fade the missing piece back in ...
       //  When the tween finishes we'll let them click to start the next round
 
-      //this.sound.play('win');
+      this.sound.play('win');
       /* calculate the level's score and find the cumulative score */
       // Score = Math.min(BaseScore - (PenaltyPerMove * Moves) - (PenaltyPerSecond * TimeElapsed)) + basePoints
-      let levelScore = Math.min(this.BaseScore - (PenaltyPerMove*this.moves) - (PenaltyPerSecond * (this.leveltimer-this.timeLeft))) + BasePoints;
+      let levelScore = Math.max(BasePoints, (this.BaseScore - (PenaltyPerMove*this.moves) - (PenaltyPerSecond * (this.leveltimer-this.timeLeft))));
       this.score = levelScore;
 
       this.timerEvent.destroy();
@@ -563,7 +584,10 @@ this.cameras.main.setBackgroundColor(color);
         duration: this.slideSpeed,  // this.slideSpeed * 2
         ease: 'linear',
         onComplete: () => {
-          this.input.once('pointerdown', this.nextRound, this);
+          this.time.delayedCall(3000, () => {
+    this.nextRound();
+  });
+          //this.input.once('pointerdown', this.nextRound, this);
         }
       });
 
@@ -586,27 +610,30 @@ this.cameras.main.setBackgroundColor(color);
     let nextPhoto;
     let backgnd;
 
+    
     if (this.photo === 'level1') {
       nextPhoto = 'level2';
       backgnd = 'level2-back';
-      iterations = 5;
-      size = 4;
-      this.leveltimer = 120;  // set timer to 4 mins for level2
+      iterations = 15;
+      size = 3;
+      this.leveltimer = 60;  // set timer to 1 min for level2
       this.BaseScore = 1000;
-    } /*else if (this.photo === 'level2') {
-      nextPhoto = 'level2';
-      backgnd = 'level2-back';
-      iterations = 30;
-      size = 5;
-    }*/
+    } else if (this.photo === 'level2') {
+      nextPhoto = 'level3';
+      backgnd = 'level3-back';
+      iterations = 20;
+      size = 3;
+      this.leveltimer = 90;
+      this.BaseScore = 1500;
+    }
 
     // if next level configured, set and start the next level
     this.moveText.destroy();
     this.movesLabel.destroy();
-
+    
 
     this.backgnd.setTexture(backgnd);  // replace the puzzle background 
-    this.reveal = this.add.image(this.pieces.x, this.pieces.y, nextPhoto).setOrigin(0, 0);
+    this.reveal = this.add.image(offsetX, offsetY, nextPhoto).setOrigin(0, 0);
     this.reveal.setPostPipeline('WipePostFX');
     const pipeline = this.reveal.getPostPipeline('WipePostFX');
     pipeline.setTopToBottom();
@@ -614,8 +641,10 @@ this.cameras.main.setBackgroundColor(color);
 
     this.tweens.add({
       targets: pipeline,
-      progress: 1,
-      duration: 2000,
+      progress: 1.5,
+      duration: 3000,
+      alfa: 0.5,
+      ease: 'linear',
 
       onComplete: () => {
         this.photo = nextPhoto;
@@ -696,13 +725,100 @@ this.cameras.main.setBackgroundColor(color);
         this.timeLeft--;
         updateTimerDisplay();
         drawArc();
-
+        if (this.timeLeft === 4) {
+          this.sound.play('fail');
+        }
         if (this.timeLeft === 0) {
           this.onCountdownFinished();
         }
       }
     });
   }
+
+  onCountdownFinished() {
+  
+
+  // Create a popup container
+  const popupContainer = this.add.container(500, 375);
+
+  // Background for the popup
+  const popupBackground = this.add.rectangle(0, 0, 400, 250, 0x000000, 0.8);
+  popupContainer.add(popupBackground);
+
+  // "Game Over" text
+  const gameOverText = this.add.text(0, -100, 'Game Over', {
+    fontSize: '30px',
+    fontFamily: 'Arial',
+    color: '#fff',
+    align: 'center',
+  }).setOrigin(0.5);
+  popupContainer.add(gameOverText);
+
+  // "Time's up!" text
+  const timesUpText = this.add.text(0, -50, "Time's up!", {
+    fontSize: '20px',
+    fontFamily: 'Arial',
+    color: '#ffffff',
+    align: 'center',
+  }).setOrigin(0.5);
+  popupContainer.add(timesUpText);
+
+  // "Save the score?" text
+  const popupText = this.add.text(0, 0, 'Save the score?\n'+this.score.toString(), {
+    fontSize: '20px',
+    fontFamily: 'Arial',
+    color: '#ffffff',
+    align: 'center',
+  }).setOrigin(0.5);
+  popupContainer.add(popupText);
+
+  // "Yes" button
+  const yesButton = this.add.text(-75, 75, 'Yes', {
+    fontSize: '18px',
+    fontFamily: 'Arial',
+    color: '#00ff00',
+    backgroundColor: '#333333',
+    padding: { x: 10, y: 5 },
+    align: 'center',
+  }).setOrigin(0.5).setInteractive();
+
+  // "No" button
+  const noButton = this.add.text(75, 75, 'No', {
+    fontSize: '18px',
+    fontFamily: 'Arial',
+    color: '#ff0000',
+    backgroundColor: '#333333',
+    padding: { x: 10, y: 5 },
+    align: 'center',
+  }).setOrigin(0.5).setInteractive();
+
+  popupContainer.add(yesButton);
+  popupContainer.add(noButton);
+
+  // Handle "Yes" button click
+  yesButton.on('pointerdown', () => {
+    /* SAVE SCORE */
+
+
+
+
+    /* DELAY BEFORE RELOAD */
+
+    window.location.reload();
+    // Remove popup
+    popupContainer.destroy();
+  });
+
+  // Handle "No" button click
+  noButton.on('pointerdown', () => {
+    // Restart the game
+    window.location.reload();
+
+    // Remove popup
+    popupContainer.destroy();
+  });
+}
+  
 }
 
 
@@ -754,7 +870,12 @@ const config = {
   parent: 'phaser-container',
   scene: [Preloader, GameStart, Game, FinalScene], //
   pipeline: { ShinePostFX, WipePostFX },
-  
+  scale: {
+      mode: Phaser.Scale.NONE,
+      autoCenter: Phaser.Scale.CENTER_BOTH,
+      width: 1000,
+      height: 750,
+  }
   
 
 };  
