@@ -28,7 +28,7 @@ func GetUsers() []User {
 
 func GetUsersByGameName(game_name string) []User {
 	var users []User
-	if err := globals.GMSDB.Find(&users, "game_name = ?", game_name).Error; err != nil {
+	if err := globals.GMSDB.Find(&users, "game_name = ?", game_name).Order("score DESC").Error; err != nil {
 		log.Printf("(Error) : error getting users : %v", err)
 	}
 	return users

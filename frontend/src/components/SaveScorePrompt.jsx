@@ -35,7 +35,9 @@ const SaveScorePrompt = ({ visible, onClose, score, gameName }) => {
       setMessage("Failed to save score. Please try again.");
       if (error?.response?.data?.error) {
         setMessage(error?.response?.data?.error)
-        setTimeout(handleClose, 1500);
+        if (error?.response?.status!=401) {
+          setTimeout(handleClose, 1500);
+        }
       }
     } finally {
       setLoading(false);
