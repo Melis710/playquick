@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import ShinePostFX from './ShinePostFX';
 import WipePostFX from './WipePostFX';
-import SlidingPuzzlePage from '../../pages/SlidingPuzzlePage';
+import React from 'react';
 
 /* constants for game logic */
 const SlidingPuzzle = {
@@ -662,8 +662,18 @@ this.cameras.main.setBackgroundColor(color);
 
   startLevelCountdown(seconds) {
     // If timer exists from previous level, destroy 
-    if (this.timerText) this.timerText.destroy();
-    if (this.timerGraphics) this.timerGraphics.destroy();
+    if (this.timerEvent) {
+      this.timerEvent.remove();
+      this.timerEvent = null;
+    }
+    if (this.timerText) {
+      this.timerText.destroy();
+      this.timerText = null;
+    }
+    if (this.timerGraphics) {
+      this.timerGraphics.destroy();
+      this.timerGraphics = null;
+    }
     // initialize time values with the argument passed in
     this.timeLeft = seconds;
     this.totalTime = seconds;
@@ -736,88 +746,10 @@ this.cameras.main.setBackgroundColor(color);
   }
 
   onCountdownFinished() {
-  
-
-  // Create a popup container
-  const popupContainer = this.add.container(500, 375);
-
-  // Background for the popup
-  const popupBackground = this.add.rectangle(0, 0, 400, 250, 0x000000, 0.8);
-  popupContainer.add(popupBackground);
-
-  // "Game Over" text
-  const gameOverText = this.add.text(0, -100, 'Game Over', {
-    fontSize: '30px',
-    fontFamily: 'Arial',
-    color: '#fff',
-    align: 'center',
-  }).setOrigin(0.5);
-  popupContainer.add(gameOverText);
-
-  // "Time's up!" text
-  const timesUpText = this.add.text(0, -50, "Time's up!", {
-    fontSize: '20px',
-    fontFamily: 'Arial',
-    color: '#ffffff',
-    align: 'center',
-  }).setOrigin(0.5);
-  popupContainer.add(timesUpText);
-
-  // "Save the score?" text
-  const popupText = this.add.text(0, 0, 'Save the score?\n'+this.score.toString(), {
-    fontSize: '20px',
-    fontFamily: 'Arial',
-    color: '#ffffff',
-    align: 'center',
-  }).setOrigin(0.5);
-  popupContainer.add(popupText);
-
-  // "Yes" button
-  const yesButton = this.add.text(-75, 75, 'Yes', {
-    fontSize: '18px',
-    fontFamily: 'Arial',
-    color: '#00ff00',
-    backgroundColor: '#333333',
-    padding: { x: 10, y: 5 },
-    align: 'center',
-  }).setOrigin(0.5).setInteractive();
-
-  // "No" button
-  const noButton = this.add.text(75, 75, 'No', {
-    fontSize: '18px',
-    fontFamily: 'Arial',
-    color: '#ff0000',
-    backgroundColor: '#333333',
-    padding: { x: 10, y: 5 },
-    align: 'center',
-  }).setOrigin(0.5).setInteractive();
-
-  popupContainer.add(yesButton);
-  popupContainer.add(noButton);
-
-  // Handle "Yes" button click
-  yesButton.on('pointerdown', () => {
-    /* SAVE SCORE */
-
-
-
-
-    /* DELAY BEFORE RELOAD */
-
-    window.location.reload();
-    // Remove popup
-    popupContainer.destroy();
-  });
-
-  // Handle "No" button click
-  noButton.on('pointerdown', () => {
-    // Restart the game
-    window.location.reload();
-
-    // Remove popup
-    popupContainer.destroy();
-  });
-}
+    this.game.events.emit('gameOver',{
+      score:this.score,
+    });
+  }
   
 }
 
@@ -878,6 +810,7 @@ const config = {
   }
   
 
-};  
+};
+
 
 export default config;  // export the config object for use in ../pages/SlidingPuzzlePage.jsx

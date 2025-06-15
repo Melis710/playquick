@@ -2,13 +2,13 @@
 import React from "react";
 import Header from "../components/Header";
 import { Link } from "react-router-dom";
-
+import GameSelect from "../components/GameSelect";
 
 const HomePage = () => {
   return (
     <div className='HomePage'>
       <Header />
-      <Link to="/car_game">Car Game</Link>
+      <GameSelect></GameSelect>
     </div>
   );
 };

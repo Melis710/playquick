@@ -2,45 +2,55 @@ import React, { useEffect, useState } from "react";
 import Phaser from 'phaser';
 import config from '../games/SlidingPuzzle/Game';
 import { FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
-
+import SaveScorePrompt from "../components/SaveScorePrompt";
 
 let game = null;
-export default function SlidingPuzzlePage() {
-  const [isMuted, setIsMuted] = useState(false);
 
+const SlidingPuzzlePage = () => {
+  const [isMuted, setIsMuted] = useState(false);
+  const [score, setScore] = useState(0);
+  const [showSavePrompt, setShowSavePrompt] = useState(false);
+  const [resetTrigger, setResetTrigger] = useState(0); // increment to reset game
+
+  // This effect handles Phaser game creation/destruction on resetTrigger change only
   useEffect(() => {
-    if (!game) {
-      game = new Phaser.Game(config); 
-    } else {
-      if (game.sound) {
-        game.sound.mute = isMuted;
-      }
+    if (game) {
+      game.destroy(true);
+      game = null;
     }
 
-    const checkMute = () => {
-      if (game && game.sound) {
-        setIsMuted(game.sound.mute);
-      }
+    game = new Phaser.Game(config);
+
+    // Set mute state on new game instance
+    if (game.sound) {
+      game.sound.mute = isMuted;
+    }
+
+    const handleGameOver = ({ score }) => {
+      setScore(score);
+      setShowSavePrompt(true);
     };
 
-    const timer = setTimeout(checkMute, 500);
+    game.events.on('gameOver', handleGameOver);
 
     return () => {
       if (game) {
+        game.events.off('gameOver', handleGameOver);
         game.destroy(true);
         game = null;
       }
-      clearTimeout(timer);
     };
-  }, []);
+  }, [resetTrigger]); // only runs when resetTrigger changes
+
+  // This effect keeps Phaser mute state in sync with React state without resetting game
+  useEffect(() => {
+    if (game && game.sound) {
+      game.sound.mute = isMuted;
+    }
+  }, [isMuted]);
 
   const toggleMute = () => {
-    if (!game || !game.sound) return;
-
-    const newMuteState = !game.sound.mute;
-    game.sound.mute = newMuteState;
-
-    setIsMuted(newMuteState);
+    setIsMuted(prev => !prev);
   };
 
   const handleFullscreen = () => {
@@ -118,6 +128,17 @@ export default function SlidingPuzzlePage() {
           zIndex: 0,
         }}
       />
+      
+      <SaveScorePrompt
+        visible={showSavePrompt}
+        onClose={() => {
+          setShowSavePrompt(false);
+          // trigger Phaser game reset
+          setResetTrigger(prev => prev + 1);
+        }}
+        score={score}
+        gameName="sliding_puzzle_game"
+      />
 
       {/* Top Bar */}
       <div
@@ -174,3 +195,5 @@ export default function SlidingPuzzlePage() {
     </div>
   );
 }
+
+export default SlidingPuzzlePage;
