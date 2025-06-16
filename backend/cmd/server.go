@@ -22,5 +22,5 @@ func InitializeServer(port string) {
 	r.GET("/score/players/:game_name", endpoints.GetScore)
 
 	log.Printf("Server running on :%s", port)
-	r.RunTLS(":"+port, "certs/localhost+1.pem", "certs/localhost+1-key.pem")
+	r.RunTLS("0.0.0.0:"+port, "certs/localhost+1.pem", "certs/localhost+1-key.pem")
 }
