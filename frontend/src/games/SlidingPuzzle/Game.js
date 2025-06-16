@@ -38,19 +38,19 @@ class Preloader extends Phaser.Scene {
     this.load.image('level3-back', 'src/games/SlidingPuzzle/assets/level3-back.jpg');  // backgLevel for level 3
     this.load.image('level3', 'src/games/SlidingPuzzle/assets/level3.jpg');  // puzzle image for level 3
 
-    
+
 
     // load audio
     this.load.setPath('https://labs.phaser.io/assets/games/emoji-match/sounds/');
-    this.load.audio('fail', [ 'countdown.ogg', 'countdown.m4a', 'countdown.mp3' ]);
+    this.load.audio('fail', ['countdown.ogg', 'countdown.m4a', 'countdown.mp3']);
     this.load.setPath('https://labs.phaser.io/assets/games/sliding-puzzle/audio');
-    this.load.audio('move', [ 'move.m4a', 'move.wav', 'move.ogg' ]);
-    this.load.audio('win', [ 'win.m4a', 'win.wav', 'win.ogg' ]);
-    
-    
+    this.load.audio('move', ['move.m4a', 'move.wav', 'move.ogg']);
+    this.load.audio('win', ['win.m4a', 'win.wav', 'win.ogg']);
+
+
   }
   create() {
-    
+
     this.scene.start('GameStart');  // start the GameStart scene after preloading
   }
 }
@@ -59,16 +59,16 @@ class Preloader extends Phaser.Scene {
 class GameStart extends Phaser.Scene {
   constructor() {
     super('GameStart');
-    
+
   }
   create() {
-    
+
     const color = this.registry.get('bgColor') || '#e6cab3';
-this.cameras.main.setBackgroundColor(color);
+    this.cameras.main.setBackgroundColor(color);
     const frame_inside = this.add.image(500, 375, 'frame-inside');
     const play_button = this.add.image(500, 540, 'play-button');
 
-    
+
 
     frame_inside.setPostPipeline('WipePostFX');
     play_button.setPostPipeline(['WipePostFX', 'ShinePostFX']);
@@ -115,10 +115,10 @@ this.cameras.main.setBackgroundColor(color);
             progress: 1,
             duration: 2000,  // wipe effect duration
             onComplete: () => {
-              
+
               this.scene.start('Game');
-              
-              
+
+
             }
           });
         });
@@ -161,9 +161,9 @@ class Game extends Phaser.Scene {
   }
 
   create() {
-    
+
     const color = this.registry.get('bgColor') || '#e6cab3';
-this.cameras.main.setBackgroundColor(color);
+    this.cameras.main.setBackgroundColor(color);
     const frame = this.add.image(500, 375, 'frame');  // add the puzzle frame
 
     window.solve = () => {
@@ -197,18 +197,18 @@ this.cameras.main.setBackgroundColor(color);
         this.reveal.destroy();  // destroy the reveal
         this.leveltimer = 10;  // set timer to 10 for level1
         this.BaseScore = 100;  // base score is 500 for level1
-        this.scoreLabel = this.add.text(timer_x, timer_y+300, 'Score:', {
-      fontSize: '28px',
-      fontFamily: 'Arial',
-      color: timer_color,
-      //fontStyle: 'bold',
-    }).setOrigin(0.5);
-    this.scoreText = this.add.text(timer_x+70, timer_y+300, this.score.toString(), {
-      fontSize: '28px',
-      fontFamily: 'Arial',
-      color: timer_color,
-      //fontStyle: 'bold',
-    }).setOrigin(0.5);
+        this.scoreLabel = this.add.text(timer_x, timer_y + 300, 'Score:', {
+          fontSize: '28px',
+          fontFamily: 'Arial',
+          color: timer_color,
+          //fontStyle: 'bold',
+        }).setOrigin(0.5);
+        this.scoreText = this.add.text(timer_x + 70, timer_y + 300, this.score.toString(), {
+          fontSize: '28px',
+          fontFamily: 'Arial',
+          color: timer_color,
+          //fontStyle: 'bold',
+        }).setOrigin(0.5);
         this.startPuzzle('level1', 2, 2);  // start the Puzzle
       }
     });
@@ -222,7 +222,7 @@ this.cameras.main.setBackgroundColor(color);
    *    columns: number of columns in puzzle
    */
   startPuzzle(key, rows, columns) {
-    
+
     this.photo = key;
 
     //  The size of the puzzle, in pieces (not pixels)
@@ -433,7 +433,7 @@ this.cameras.main.setBackgroundColor(color);
     this.action = SlidingPuzzle.ALLOW_CLICK;  // game actually starts for user
     this.moves = 0;  // initialize move count for the new level
     const moveX = timer_x;
-    const moveY = timer_y+150;
+    const moveY = timer_y + 150;
 
     // Moves
     this.movesLabel = this.add.text(moveX, moveY, 'Moves:', {
@@ -442,13 +442,13 @@ this.cameras.main.setBackgroundColor(color);
       color: timer_color,
       //fontStyle: 'bold',
     }).setOrigin(0.5);
-    this.moveText = this.add.text(moveX+70, moveY, this.moves.toString(), {
+    this.moveText = this.add.text(moveX + 70, moveY, this.moves.toString(), {
       fontSize: '28px',
       fontFamily: 'Arial',
       color: timer_color,
     }).setOrigin(0.5);
-    
-    
+
+
     this.startLevelCountdown(this.leveltimer);  // start the timer
   }
 
@@ -569,7 +569,7 @@ this.cameras.main.setBackgroundColor(color);
       this.sound.play('win');
       /* calculate the level's score and find the cumulative score */
       // Score = Math.min(BaseScore - (PenaltyPerMove * Moves) - (PenaltyPerSecond * TimeElapsed)) + basePoints
-      let levelScore = Math.max(BasePoints, (this.BaseScore - (PenaltyPerMove*this.moves) - (PenaltyPerSecond * (this.leveltimer-this.timeLeft))));
+      let levelScore = Math.max(BasePoints, (this.BaseScore - (PenaltyPerMove * this.moves) - (PenaltyPerSecond * (this.leveltimer - this.timeLeft))));
       this.score = levelScore;
 
       this.timerEvent.destroy();
@@ -585,8 +585,8 @@ this.cameras.main.setBackgroundColor(color);
         ease: 'linear',
         onComplete: () => {
           this.time.delayedCall(3000, () => {
-    this.nextRound();
-  });
+            this.nextRound();
+          });
           //this.input.once('pointerdown', this.nextRound, this);
         }
       });
@@ -610,7 +610,7 @@ this.cameras.main.setBackgroundColor(color);
     let nextPhoto;
     let backgnd;
 
-    
+
     if (this.photo === 'level1') {
       nextPhoto = 'level2';
       backgnd = 'level2-back';
@@ -630,7 +630,7 @@ this.cameras.main.setBackgroundColor(color);
     // if next level configured, set and start the next level
     this.moveText.destroy();
     this.movesLabel.destroy();
-    
+
 
     this.backgnd.setTexture(backgnd);  // replace the puzzle background 
     this.reveal = this.add.image(offsetX, offsetY, nextPhoto).setOrigin(0, 0);
@@ -653,6 +653,7 @@ this.cameras.main.setBackgroundColor(color);
         if (size && iterations && nextPhoto && backgnd) {
           this.startPuzzle(nextPhoto, size, size);
         } else {
+          this.registry.set('score', this.score);
           this.scene.start('FinalScene');
         }
       }
@@ -746,11 +747,11 @@ this.cameras.main.setBackgroundColor(color);
   }
 
   onCountdownFinished() {
-    this.game.events.emit('gameOver',{
-      score:this.score,
+    this.game.events.emit('gameOver', {
+      score: this.score,
     });
   }
-  
+
 }
 
 
@@ -766,7 +767,7 @@ class FinalScene extends Phaser.Scene {
 
   create() {
     const color = this.registry.get('bgColor') || '#e6cab3';
-this.cameras.main.setBackgroundColor(color);
+    this.cameras.main.setBackgroundColor(color);
     this.add.particles(0, 0, 'raster', {
       speed: 100,
       lifespan: 5000,
@@ -790,6 +791,30 @@ this.cameras.main.setBackgroundColor(color);
         }
       }
     });
+
+    // Add congratulatory text
+    const text = this.add.text(500, 375, "Congratulations!\nYou have completed all the puzzles.\nNew puzzles will be added, stay tuned.", {
+      fontSize: '28px',
+      fontFamily: 'Arial',
+      color: '#0000ff',
+      align: 'center',
+    }).setOrigin(0.5);
+
+    // Add a tween for text fade-in effect (optional)
+    this.tweens.add({
+      targets: text,
+      alpha: { from: 0, to: 1 },
+      duration: 1000,
+      ease: 'Linear',
+    });
+
+    // Emit 'gameOver' event after 4 seconds
+    this.time.delayedCall(4000, () => {
+      this.game.events.emit('gameOver', {
+        score: this.registry.get('score') || 0,  // get score from registry
+      });
+    });
+
   }
 }
 
@@ -800,15 +825,15 @@ const config = {
   height: 750,
   backgroundColor: '#e6cab3',
   parent: 'phaser-container',
-  scene: [Preloader, GameStart, Game, FinalScene], //
+  scene: [Preloader, GameStart, Game, FinalScene],
   pipeline: { ShinePostFX, WipePostFX },
   scale: {
-      mode: Phaser.Scale.NONE,
-      autoCenter: Phaser.Scale.CENTER_BOTH,
-      width: 1000,
-      height: 750,
+    mode: Phaser.Scale.NONE,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    width: 1000,
+    height: 750,
   }
-  
+
 
 };
 
