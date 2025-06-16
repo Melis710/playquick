@@ -12,7 +12,7 @@ func InitializeServer(port string) {
 	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173"}, // React dev server
+		AllowOrigins:     []string{"https://10.0.0.244:5173", "https://localhost:5173"}, // React dev server
 		AllowMethods:     []string{"GET", "POST"},
 		AllowHeaders:     []string{"Origin", "Content-Type"},
 		AllowCredentials: true,
@@ -22,5 +22,5 @@ func InitializeServer(port string) {
 	r.GET("/score/players/:game_name", endpoints.GetScore)
 
 	log.Printf("Server running on :%s", port)
-	r.Run(":" + port)
+	r.RunTLS(":"+port, "certs/localhost+1.pem", "certs/localhost+1-key.pem")
 }

@@ -11,16 +11,16 @@ import (
 )
 
 type ScoreRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-	GameName string `json:"game_name"`
-	Score    int    `json:"score"`
+	Username string `json:"username" binding:"required,min=3,max=16"`
+	Password string `json:"password" binding:"required,min=8"`
+	GameName string `json:"game_name" binding:"required"`
+	Score    int    `json:"score" binding:"required,gte=0"`
 }
 
 func SaveScore(c *gin.Context) {
 	var req ScoreRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Min 3, Max 16 length username.\nMin 8 length password."})
 		return
 	}
 
@@ -60,7 +60,6 @@ func SaveScore(c *gin.Context) {
 	}
 
 	//Check if new score less or equal to old score
-	log.Printf("%v", req.Score)
 	if req.Score <= user.Score {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Not highest score"})
 		return

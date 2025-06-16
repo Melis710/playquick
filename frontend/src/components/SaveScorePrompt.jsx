@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { X } from "lucide-react"; // Optional icon library
+import React, { useState, useRef, useEffect } from "react";
+import { X } from "lucide-react";
 import api from "../api/api";
 
 const SaveScorePrompt = ({ visible, onClose, score, gameName }) => {
@@ -8,6 +8,36 @@ const SaveScorePrompt = ({ visible, onClose, score, gameName }) => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  const modalRef = useRef(null);
+  const clickStartedInside = useRef(false);
+
+  useEffect(() => {
+    if (!visible) return;
+
+    const handleMouseDown = (e) => {
+      if (modalRef.current?.contains(e.target)) {
+        clickStartedInside.current = true;
+      } else {
+        clickStartedInside.current = false;
+      }
+    };
+
+    const handleMouseUp = (e) => {
+      const endedInside = modalRef.current?.contains(e.target);
+      if (!clickStartedInside.current && !endedInside) {
+        handleClose();
+      }
+    };
+
+    document.addEventListener("mousedown", handleMouseDown);
+    document.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      document.removeEventListener("mousedown", handleMouseDown);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [visible]);
 
   if (!visible) return null;
 
@@ -32,28 +62,21 @@ const SaveScorePrompt = ({ visible, onClose, score, gameName }) => {
       setMessage("Score saved successfully!");
       setTimeout(handleClose, 1500);
     } catch (error) {
-      setMessage("Failed to save score. Please try again.");
       if (error?.response?.data?.error) {
-        setMessage(error?.response?.data?.error)
-        if (error?.response?.status!=401) {
-          setTimeout(handleClose, 1500);
-        }
+        setMessage(error.response.data.error);
+      } else {
+        setMessage("Failed to save score. Please try again.");
       }
     } finally {
       setLoading(false);
     }
   };
 
-  const stopPropagation = (e) => e.stopPropagation();
-
   return (
-    <div
-      className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center"
-      onClick={handleClose}
-    >
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
       <div
+        ref={modalRef}
         className="relative bg-white p-6 rounded-2xl shadow-lg w-full max-w-md"
-        onClick={stopPropagation}
       >
         <button
           onClick={handleClose}
@@ -65,7 +88,9 @@ const SaveScorePrompt = ({ visible, onClose, score, gameName }) => {
 
         {wantsToSave === null ? (
           <>
-            <h2 className="text-xl font-semibold mb-4">Do you want to save your score of {score}?</h2>
+            <h2 className="text-xl font-semibold mb-4">
+              Do you want to save your score of {score}?
+            </h2>
             <div className="flex gap-4">
               <button
                 onClick={() => setWantsToSave(true)}
@@ -83,7 +108,9 @@ const SaveScorePrompt = ({ visible, onClose, score, gameName }) => {
           </>
         ) : (
           <form onSubmit={handleSave} className="space-y-4">
-            <h2 className="text-xl font-semibold mb-2">Save Your Score of {score}</h2>
+            <h2 className="text-xl font-semibold mb-2">
+              Save Your Score of {score}
+            </h2>
             <input
               type="text"
               placeholder="Username"
@@ -107,7 +134,9 @@ const SaveScorePrompt = ({ visible, onClose, score, gameName }) => {
             >
               {loading ? "Saving..." : "Submit"}
             </button>
-            {message && <p className="text-sm text-center mt-2">{message}</p>}
+            {message && (
+              <p className="text-sm text-center mt-2 text-red-500">{message}</p>
+            )}
           </form>
         )}
       </div>
