@@ -12,7 +12,7 @@ import (
 
 type ScoreRequest struct {
 	Username string `json:"username" binding:"required,min=3,max=16"`
-	Password string `json:"password" binding:"required,min=8"`
+	Password string `json:"password" binding:"required,min=4,max=72	"`
 	GameName string `json:"game_name" binding:"required"`
 	Score    int    `json:"score" binding:"required,gte=0"`
 }
@@ -20,7 +20,7 @@ type ScoreRequest struct {
 func SaveScore(c *gin.Context) {
 	var req ScoreRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Min 3, Max 16 length username.\nMin 8 length password."})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Min 3, Max 16 length username.\nMin 4 length password."})
 		return
 	}
 
